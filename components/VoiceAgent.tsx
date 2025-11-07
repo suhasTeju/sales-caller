@@ -141,7 +141,7 @@ export default function VoiceAgent() {
       isNew: true,
     };
 
-    setConversationHistory((prev) => [...prev, newMessage].slice(-20));
+    setConversationHistory((prev) => [...prev, newMessage]);
 
     // Remove highlight after 3 seconds
     setTimeout(() => {
@@ -203,7 +203,7 @@ export default function VoiceAgent() {
           agent: {
             listen: { provider: { type: 'deepgram', model: 'nova-3' } },
             think: {
-              provider: { type: 'anthropic', model: 'claude-3-5-haiku-latest' },
+              provider: { type: 'google', model: 'gemini-2.5-flash-lite' },
               prompt: currentPrompt,
             },
             speak: { provider: { type: 'deepgram', model: 'aura-2-thalia-en' } },
