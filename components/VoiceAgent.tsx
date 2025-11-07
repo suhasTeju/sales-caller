@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 import { Activity, AlertCircle, Phone, PhoneOff, MessageSquare, Edit3, Save, X, Eye, EyeOff, Copy, Check, Trash2 } from 'lucide-react';
 import { SALES_AGENT_SYSTEM_PROMPT } from '@/lib/agent-prompt';
 
@@ -138,25 +137,15 @@ export default function VoiceAgent() {
       speaker,
       message: message.trim(),
       timestamp: Date.now(),
-      isNew: true,
+      isNew: false,
     };
 
     setConversationHistory((prev) => [...prev, newMessage]);
 
-    // Remove highlight after 3 seconds
-    setTimeout(() => {
-      setConversationHistory((prev) =>
-        prev.map((msg) =>
-          msg.id === messageId ? { ...msg, isNew: false } : msg
-        )
-      );
-    }, 3000);
-
-    setTimeout(() => {
-      if (conversationScrollRef.current) {
-        conversationScrollRef.current.scrollTop = conversationScrollRef.current.scrollHeight;
-      }
-    }, 100);
+    // Scroll immediately
+    if (conversationScrollRef.current) {
+      conversationScrollRef.current.scrollTop = conversationScrollRef.current.scrollHeight;
+    }
   };
 
   async function getToken() {
@@ -544,7 +533,7 @@ export default function VoiceAgent() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowPrompt(!showPrompt)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all bg-slate-700 hover:bg-slate-600"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-700 hover:bg-slate-600"
                   disabled={isConnected}
                 >
                   {showPrompt ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -553,7 +542,7 @@ export default function VoiceAgent() {
                 {!isEditingPrompt ? (
                   <button
                     onClick={handleEditPrompt}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isConnected}
                   >
                     <Edit3 className="w-4 h-4" />
@@ -563,14 +552,14 @@ export default function VoiceAgent() {
                   <>
                     <button
                       onClick={handleSavePrompt}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all bg-green-600 hover:bg-green-700"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-green-600 hover:bg-green-700"
                     >
                       <Save className="w-4 h-4" />
                       Save
                     </button>
                     <button
                       onClick={handleCancelEdit}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all bg-slate-600 hover:bg-slate-700"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-600 hover:bg-slate-700"
                     >
                       <X className="w-4 h-4" />
                       Cancel
@@ -588,12 +577,7 @@ export default function VoiceAgent() {
             )}
 
             {showPrompt && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-              >
+              <div>
                 {isEditingPrompt ? (
                   <div>
                     <textarea
@@ -621,7 +605,7 @@ export default function VoiceAgent() {
                     </pre>
                   </div>
                 )}
-              </motion.div>
+              </div>
             )}
           </div>
         </div>
@@ -632,7 +616,7 @@ export default function VoiceAgent() {
             <button
               onClick={connect}
               disabled={connectionStatus === 'connecting'}
-              className="flex items-center gap-2 px-8 py-4 rounded-lg font-semibold transition-all bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-8 py-4 rounded-lg font-semibold bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Phone className="w-5 h-5" />
               {connectionStatus === 'connecting' ? 'Connecting...' : 'Start Call'}
@@ -640,7 +624,7 @@ export default function VoiceAgent() {
           ) : (
             <button
               onClick={disconnect}
-              className="flex items-center gap-2 px-8 py-4 rounded-lg font-semibold transition-all bg-red-600 hover:bg-red-700"
+              className="flex items-center gap-2 px-8 py-4 rounded-lg font-semibold bg-red-600 hover:bg-red-700"
             >
               <PhoneOff className="w-5 h-5" />
               End Call
@@ -660,7 +644,7 @@ export default function VoiceAgent() {
                 ? 'bg-yellow-600/20 text-yellow-400'
                 : 'bg-gray-600/20 text-gray-400'
             }`}>
-              <Activity className="w-4 h-4 animate-pulse" />
+              <Activity className="w-4 h-4" />
               {visualState === 'listening' && 'Listening...'}
               {visualState === 'speaking' && 'Agent Speaking...'}
               {visualState === 'thinking' && 'Thinking...'}
@@ -687,19 +671,13 @@ export default function VoiceAgent() {
             </h2>
             <div className="min-h-[400px] max-h-[600px] overflow-y-auto">
               {transcript ? (
-                <motion.div
-                  key="transcript-display"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 border-2 border-cyan-500/50 p-6 rounded-lg"
-                >
+                <div className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 border-2 border-cyan-500/50 p-6 rounded-lg">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
                     <div className="text-xs font-semibold text-cyan-300 uppercase tracking-wide">What to say now:</div>
                   </div>
                   <p className="text-2xl text-white leading-relaxed font-medium">{transcript}</p>
-                </motion.div>
+                </div>
               ) : (
                 <div className="text-center py-12 text-slate-400">
                   {isConnected ? 'Listening to client... suggestions will appear here' : 'Connect to start'}
@@ -719,7 +697,7 @@ export default function VoiceAgent() {
                 <div className="flex gap-2">
                   <button
                     onClick={handleCopyConversation}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all bg-slate-700 hover:bg-slate-600 disabled:opacity-50"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-slate-700 hover:bg-slate-600 disabled:opacity-50"
                     title="Copy conversation transcript"
                   >
                     {copiedConversation ? (
@@ -736,7 +714,7 @@ export default function VoiceAgent() {
                   </button>
                   <button
                     onClick={handleClearConversation}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 border border-red-600/30"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 border border-red-600/30"
                     title="Clear conversation history"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -755,38 +733,24 @@ export default function VoiceAgent() {
                 </p>
               ) : (
                 conversationHistory.map((message) => (
-                  <motion.div
+                  <div
                     key={message.id}
-                    initial={{ opacity: 0, x: message.speaker === 'user' ? -20 : 20 }}
-                    animate={{
-                      opacity: 1,
-                      x: 0,
-                      scale: message.isNew ? [1, 1.02, 1] : 1,
-                    }}
-                    transition={{ duration: 0.3 }}
-                    className={`p-4 rounded-lg transition-all duration-300 ${
+                    className={`p-4 rounded-lg ${
                       message.speaker === 'user'
-                        ? message.isNew
-                          ? 'bg-green-600/40 border-2 border-green-400 shadow-lg shadow-green-500/50'
-                          : 'bg-green-600/20 border border-green-600/30'
-                        : message.isNew
-                          ? 'bg-blue-600/40 border-2 border-blue-400 shadow-lg shadow-blue-500/50'
-                          : 'bg-blue-600/20 border border-blue-600/30'
+                        ? 'bg-green-600/20 border border-green-600/30'
+                        : 'bg-blue-600/20 border border-blue-600/30'
                     }`}
                   >
                     <div className="flex justify-between items-start mb-2">
-                      <span className="font-semibold text-sm flex items-center gap-2">
+                      <span className="font-semibold text-sm">
                         {message.speaker === 'user' ? 'You' : 'Assistant'}
-                        {message.isNew && (
-                          <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
-                        )}
                       </span>
                       <span className="text-xs text-slate-400">
                         {new Date(message.timestamp).toLocaleTimeString()}
                       </span>
                     </div>
                     <p className="text-slate-100">{message.message}</p>
-                  </motion.div>
+                  </div>
                 ))
               )}
             </div>
