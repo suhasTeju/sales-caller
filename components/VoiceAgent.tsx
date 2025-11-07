@@ -195,7 +195,7 @@ export default function VoiceAgent() {
               provider: { type: 'google', model: 'gemini-2.5-flash-lite' },
               prompt: currentPrompt,
             },
-            speak: { provider: { type: 'deepgram', model: 'aura-2-thalia-en' } },
+            speak: { provider: { type: 'deepgram', model: 'aura-stella-en' } },
           },
         };
 
